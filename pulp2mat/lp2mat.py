@@ -1,6 +1,7 @@
 import pulp as pl
 import numpy as np
 from typing import Iterable, Tuple
+from scipy.optimize import milp, LinearConstraint, Bounds
 
 
 def get_vars(
@@ -99,3 +100,16 @@ def get_bounds(
         ubounds[itm[0]] = itm[3]
         integrality[itm[0]] = itm[1]
     return (integrality, lbounds, ubounds)
+
+
+def convert_all(
+    problem: pl.LpProblem, all_vars: Iterable[dict[Tuple, pl.LpVariable]]
+) -> Tuple[np.ndarray, np.ndarray, LinearConstraint, Bounds]:
+    vars_dict, varnames = get_vars(all_vars)
+    const_mat, const_lb, const_ub = get_constraint_matrix(problem, vars_dict)
+    obj_arr = get_objective_array(problem, vars_dict)
+    integrality, lbounds, ubounds = get_bounds(vars_dict)
+    # call scipy.optimize.milp
+    bounds = Bounds(lbounds, ubounds)
+    consts = LinearConstraint(const_mat, const_lb, const_ub)
+    return (obj_arr, integrality, consts, bounds)
