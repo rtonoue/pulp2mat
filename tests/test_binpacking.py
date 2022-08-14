@@ -3,7 +3,7 @@ import pulp as pl
 import numpy as np
 from scipy.optimize import milp, LinearConstraint, Bounds
 
-import pulp2mat
+from pulp2mat import get_vars, get_bounds, get_objective_array, get_constraint_matrix
 
 
 class BinPackingProblem:
@@ -73,8 +73,15 @@ def test_binpack2mat():
 
     bpp = BinPackingProblem(item_sizes, bin_size)
     bpp.solve()
+    # convert to matrix formulation
     obj_val_pulp = bpp.problem.objective.value()
-    mat_form = pulp2mat.lp2mat([bpp.x, bpp.y], bpp.problem)
-    result = pulp2mat.solve_scipy_milp(mat_form)
+    vars_dict, varnames = get_vars([bpp.x, bpp.y])
+    const_mat, const_lb, const_ub = get_constraint_matrix(bpp.problem, vars_dict)
+    obj_arr = get_objective_array(bpp.problem, vars_dict)
+    integrality, lbounds, ubounds = get_bounds(vars_dict)
+    # call scipy.optimize.milp
+    bounds = Bounds(lbounds, ubounds)
+    consts = LinearConstraint(const_mat, const_lb, const_ub)
+    result = milp(c=obj_arr, constraints=consts, integrality=integrality, bounds=bounds)
     assert result.status == 0
     assert result.fun == obj_val_pulp
