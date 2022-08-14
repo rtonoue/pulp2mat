@@ -6,9 +6,10 @@ authors = ["rtonoue <rtonoue625@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.8,<3.12"
 PuLP = "^2.6.0"
 numpy = "^1.23.2"
+scipy = "^1.9.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
