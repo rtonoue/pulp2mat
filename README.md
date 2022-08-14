@@ -28,14 +28,8 @@ Without poetry, please look at pyproject.toml and install all dependencies manua
 
 All variables must be defined in dictionaries. The key is tuple of variable indices, the value is pulp.LpVariable.
 
-For example, the binpacking problem can be formulated as below;
+For example, the binpacking problem can be formulated with pulp as below;
 
-$$ Minimize: y[j] $$
-$$ Subject\ to:$$
-$$ \Sigma_{j}x_{ij} = 1$$
-$$ \Sigma_{i}S_{i}x_{ij} = B_{j}y_{j}$$
-
-With pulp, 
 ```python
 import pulp as pl
 import numpy as np
@@ -44,6 +38,8 @@ item_sizes = np.array([7, 3, 3, 1, 6, 8, 4, 9, 5, 2])
 num_items = len(item_sizes)
 num_bins = len(item_sizes)
 bin_size = 10
+
+# Variables * must be defined as dictionaries
 x = {
     (i, j): pl.LpVariable("x_{}_{}".format(i, j), cat=pl.LpBinary)
     for i in range(num_items)
@@ -54,6 +50,7 @@ y = {
     for j in range(num_bins)
 }
 
+# Bin size constraint for each bin
 for j in range(self.num_bins):
     problem += (
         pl.lpSum(
