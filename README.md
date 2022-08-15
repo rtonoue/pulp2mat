@@ -50,8 +50,10 @@ y = {
     for j in range(num_bins)
 }
 
+problem = pl.LpProblem()
+
 # Bin size constraint for each bin
-for j in range(self.num_bins):
+for j in range(num_bins):
     problem += (
         pl.lpSum(
             x[i, j] * item_sizes[i] for i in range(num_items)
@@ -72,5 +74,5 @@ the ```pulp.LpProblem``` object and the list of variable dictionaries can be con
 import pulp2mat
 from scipy.optimize import milp
 c, integrality, constraints, bounds = pulp2mat.convert_all(problem, [x, y])
-result = milp(c, integrality, constraints, bounds)
+result = milp(c, integrality=integrality, constraints=constraints, bounds=bounds)
 ```
