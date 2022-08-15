@@ -1,7 +1,8 @@
+from typing import Iterable, Tuple
+
 import pulp as pl
 import numpy as np
-from typing import Iterable, Tuple
-from scipy.optimize import milp, LinearConstraint, Bounds
+from scipy.optimize import milp, LinearConstraint, Bounds, OptimizeResult
 
 
 def get_vars(
@@ -10,8 +11,8 @@ def get_vars(
     vars_dict = {}
     varnames = []
     idx = 0
-    for vars in all_vars:
-        for key, itm in vars.items():
+    for variables in all_vars:
+        for key, itm in variables.items():
             if itm.cat == "Continuous":
                 cat = 0
             elif itm.cat == "Integer":
@@ -22,9 +23,9 @@ def get_vars(
                 )
             lb = itm.lowBound
             ub = itm.upBound
-            if np.isnan(lb):
+            if lb is None or np.isnan(lb):
                 lb = -np.inf
-            if np.isnan(ub):
+            if ub is None or np.isnan(ub):
                 ub = np.inf
             vars_dict[itm.name] = (idx, cat, lb, ub)
             varnames.append(itm.name)
@@ -113,3 +114,16 @@ def convert_all(
     bounds = Bounds(lbounds, ubounds)
     consts = LinearConstraint(const_mat, const_lb, const_ub)
     return (obj_arr, integrality, consts, bounds)
+
+
+def decode_solution(
+    res: OptimizeResult,
+    problem: pl.LpProblem,
+    all_vars: Iterable[dict[Tuple, pl.LpVariable]],
+):
+    _, varnames = get_vars(all_vars)
+    assert len(res.x) == len(varnames)
+    values = dict()
+    for value, name in zip(res.x, varnames):
+        values[name] = value
+    problem.assignVarsVals(values)
