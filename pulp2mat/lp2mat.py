@@ -76,7 +76,10 @@ def get_objective_array(
         name = coef["name"]
         val = coef["value"]
         obj_arr[vars_dict[name][0]] = val
-    return obj_arr
+    if problem.sense == pl.LpMinimize:
+        return obj_arr
+    else:
+        return -obj_arr
 
 
 def get_bounds(

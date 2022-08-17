@@ -60,6 +60,54 @@ class BinPackingProblem:
         return stat
 
 
+class BinPackingMaximize:
+    def __init__(self, item_sizes: Iterable[int], bin_size):
+        self.item_sizes = item_sizes
+        self.num_items = len(self.item_sizes)
+        self.num_bins = len(self.item_sizes)
+        self.bin_size = bin_size
+        self.problem = pl.LpProblem(sense=pl.LpMaximize)
+        self.__init_vars()
+        self.__set_constraints()
+        self.__set_objective()
+
+    def __init_vars(self):
+        # Variables
+        self.x = {
+            (i, j): pl.LpVariable("x_{}_{}".format(i, j), cat=pl.LpBinary)
+            for i in range(self.num_items)
+            for j in range(self.num_bins)
+        }
+        self.y = {
+            j: pl.LpVariable("y_{}".format(j), cat=pl.LpBinary)
+            for j in range(self.num_bins)
+        }
+
+    def __set_constraints(self):
+        # Bin size constraints
+        for j in range(self.num_bins):
+            self.problem += (
+                pl.lpSum(
+                    self.x[i, j] * self.item_sizes[i] for i in range(self.num_items)
+                )
+                <= self.bin_size * self.y[j]
+            )
+        # One-hot constraint for each item
+        for i in range(self.num_items):
+            self.problem += pl.lpSum(self.x[i, j] for j in range(self.num_bins)) == 1
+
+    def __set_objective(self):
+        # Objective: minimize number of bins used.
+        self.problem += -pl.lpSum(self.y[j] for j in range(self.num_bins))
+
+    def solve(self, solver: pl.LpSolver = None) -> pl.LpStatus:
+        if solver is not None:
+            stat = self.problem.solve(solver)
+        else:
+            stat = self.problem.solve()
+        return stat
+
+
 def test_binpack():
     """binpacking problem with number of item 10, bin size 10"""
     item_sizes = np.array([7, 3, 3, 1, 6, 8, 4, 9, 5, 2])
@@ -92,3 +140,25 @@ def test_binpack2mat():
     decode_solution(result, bpp.problem, all_vars)
     assert result.status == 0
     assert result.fun == obj_val_pulp
+
+
+def test_maximize():
+    """test maximization"""
+    item_sizes = np.array([7, 3, 3, 1, 6, 8, 4, 9, 5, 2])
+    bin_size = 10
+    bpp = BinPackingMaximize(item_sizes, bin_size)
+    bpp.solve()
+    # convert to matrix formulation
+    obj_val_pulp = bpp.problem.objective.value()
+    all_vars = [bpp.x, bpp.y]
+    vars_dict, varnames = get_vars(all_vars)
+    const_mat, const_lb, const_ub = get_constraint_matrix(bpp.problem, vars_dict)
+    obj_arr = get_objective_array(bpp.problem, vars_dict)
+    integrality, lbounds, ubounds = get_bounds(vars_dict)
+    # call scipy.optimize.milp
+    bounds = Bounds(lbounds, ubounds)
+    consts = LinearConstraint(const_mat, const_lb, const_ub)
+    result = milp(c=obj_arr, constraints=consts, integrality=integrality, bounds=bounds)
+    decode_solution(result, bpp.problem, all_vars)
+    assert result.status == 0
+    assert result.fun == -obj_val_pulp
