@@ -7,19 +7,8 @@ It can be easily thrown to scipy.optimize.milp function.
 
 # How to install
 
-- Clone this repository.
-
 ```
-$ git clone https://github.com/rtonoue/pulp2mat.git
-$ cd pulp2mat
-```
-
-- install dependencies
-
-poetry users can install all dependencies easily.
-
-```
-$ poetry install
+$ pip install pulp2mat
 ```
 
 Without poetry, please look at pyproject.toml and install all dependencies manually. 

@@ -1,9 +1,22 @@
 [tool.poetry]
 name = "pulp2mat"
-version = "0.1.0"
+version = "0.1.2"
 description = "convert pulp model into matrix formulation for scipy.optimize.milp"
 authors = ["rtonoue <rtonoue625@gmail.com>"]
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/rtonoue/pulp2mat"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    'Programming Language :: Python :: 3',
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"

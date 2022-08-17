@@ -1,4 +1,4 @@
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, Any
 
 import pulp as pl
 import numpy as np
@@ -6,7 +6,7 @@ from scipy.optimize import milp, LinearConstraint, Bounds, OptimizeResult
 
 
 def get_vars(
-    all_vars: Iterable[dict[Tuple, pl.LpVariable]]
+    all_vars: Iterable[dict[Any, pl.LpVariable]]
 ) -> Tuple[dict[str, Tuple[int, int, np.float64, np.float64]], list[str]]:
     vars_dict = {}
     varnames = []
@@ -67,7 +67,7 @@ def get_constraint_matrix(
 
 
 def get_objective_array(
-    problem: pl.LpProblem, vars_dict: dict[str, Tuple[int, int, np.float64, np.float64]]
+    problem: pl.LpProblem, vars_dict: dict[Any, Tuple[int, int, np.float64, np.float64]]
 ) -> np.ndarray:
     n_col = len(vars_dict)
     obj_arr = np.zeros(n_col, dtype=np.float64)
@@ -76,11 +76,14 @@ def get_objective_array(
         name = coef["name"]
         val = coef["value"]
         obj_arr[vars_dict[name][0]] = val
-    return obj_arr
+    if problem.sense == pl.LpMinimize:
+        return obj_arr
+    else:
+        return -obj_arr
 
 
 def get_bounds(
-    vars_dict: dict[str, Tuple[int, int, np.float64, np.float64]]
+    vars_dict: dict[Any, Tuple[int, int, np.float64, np.float64]]
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """get 1-d arrays of l and u such that
     l <= x <= u
@@ -104,7 +107,7 @@ def get_bounds(
 
 
 def convert_all(
-    problem: pl.LpProblem, all_vars: Iterable[dict[Tuple, pl.LpVariable]]
+    problem: pl.LpProblem, all_vars: Iterable[dict[Any, pl.LpVariable]]
 ) -> Tuple[np.ndarray, np.ndarray, LinearConstraint, Bounds]:
     vars_dict, varnames = get_vars(all_vars)
     const_mat, const_lb, const_ub = get_constraint_matrix(problem, vars_dict)
@@ -119,7 +122,7 @@ def convert_all(
 def decode_solution(
     res: OptimizeResult,
     problem: pl.LpProblem,
-    all_vars: Iterable[dict[Tuple, pl.LpVariable]],
+    all_vars: Iterable[dict[Any, pl.LpVariable]],
 ):
     _, varnames = get_vars(all_vars)
     assert len(res.x) == len(varnames)
