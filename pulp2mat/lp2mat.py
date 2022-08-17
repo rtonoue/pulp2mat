@@ -6,30 +6,29 @@ from scipy.optimize import milp, LinearConstraint, Bounds, OptimizeResult
 
 
 def get_vars(
-    all_vars: Iterable[dict[Any, pl.LpVariable]]
+    problem: pl.LpProblem,
 ) -> Tuple[dict[str, Tuple[int, int, np.float64, np.float64]], list[str]]:
     vars_dict = {}
     varnames = []
     idx = 0
-    for variables in all_vars:
-        for key, itm in variables.items():
-            if itm.cat == "Continuous":
-                cat = 0
-            elif itm.cat == "Integer":
-                cat = 1
-            else:
-                raise ValueError(
-                    "LpVariable category needs to be Continuous or Integer."
-                )
-            lb = itm.lowBound
-            ub = itm.upBound
-            if lb is None or np.isnan(lb):
-                lb = -np.inf
-            if ub is None or np.isnan(ub):
-                ub = np.inf
-            vars_dict[itm.name] = (idx, cat, lb, ub)
-            varnames.append(itm.name)
-            idx += 1
+    for var in problem.variables():
+        if var.cat == "Continuous":
+            cat = 0
+        elif var.cat == "Integer":
+            cat = 1
+        else:
+            raise ValueError(
+                "LpVariable category needs to be Continuous or Integer."
+            )
+        lb = var.lowBound
+        ub = var.upBound
+        if lb is None or np.isnan(lb):
+            lb = -np.inf
+        if ub is None or np.isnan(ub):
+            ub = np.inf
+        vars_dict[var.name] = (idx, cat, lb, ub)
+        varnames.append(var.name)
+        idx += 1
     return (vars_dict, varnames)
 
 
@@ -107,9 +106,9 @@ def get_bounds(
 
 
 def convert_all(
-    problem: pl.LpProblem, all_vars: Iterable[dict[Any, pl.LpVariable]]
+    problem: pl.LpProblem,
 ) -> Tuple[np.ndarray, np.ndarray, LinearConstraint, Bounds]:
-    vars_dict, varnames = get_vars(all_vars)
+    vars_dict, varnames = get_vars(problem)
     const_mat, const_lb, const_ub = get_constraint_matrix(problem, vars_dict)
     obj_arr = get_objective_array(problem, vars_dict)
     integrality, lbounds, ubounds = get_bounds(vars_dict)
@@ -122,9 +121,8 @@ def convert_all(
 def decode_solution(
     res: OptimizeResult,
     problem: pl.LpProblem,
-    all_vars: Iterable[dict[Any, pl.LpVariable]],
 ):
-    _, varnames = get_vars(all_vars)
+    _, varnames = get_vars(problem)
     assert len(res.x) == len(varnames)
     values = dict()
     for value, name in zip(res.x, varnames):
