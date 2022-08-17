@@ -9,6 +9,7 @@ from pulp2mat import (
     get_objective_array,
     get_constraint_matrix,
     decode_solution,
+    convert_all,
 )
 
 
@@ -106,6 +107,21 @@ class BinPackingMaximize:
         else:
             stat = self.problem.solve()
         return stat
+
+
+def test_decode_solution():
+    """test for decode_solution()"""
+    #
+    x = {i: pl.LpVariable("x_{}".format(i), cat=pl.LpInteger) for i in range(2)}
+    problem = pl.LpProblem()
+    problem += x[0] + x[1]
+    problem += x[0] + x[1] >= 2
+
+    c, integrality, constraints, bounds = convert_all(problem, [x])
+    result = milp(c, integrality=integrality, constraints=constraints, bounds=bounds)
+    decode_solution(result, problem, [x])
+    assert x[0].value() == result.x[0]
+    assert x[1].value() == result.x[1]
 
 
 def test_binpack():
