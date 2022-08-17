@@ -6,7 +6,6 @@ authors = ["rtonoue <rtonoue625@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/rtonoue/pulp2mat"
-license = "MIT"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
