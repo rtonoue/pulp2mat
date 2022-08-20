@@ -117,9 +117,9 @@ def test_decode_solution():
     problem += x[0] + x[1]
     problem += x[0] + x[1] >= 2
 
-    c, integrality, constraints, bounds = convert_all(problem, [x])
+    c, integrality, constraints, bounds = convert_all(problem)
     result = milp(c, integrality=integrality, constraints=constraints, bounds=bounds)
-    decode_solution(result, problem, [x])
+    decode_solution(result, problem)
     assert x[0].value() == result.x[0]
     assert x[1].value() == result.x[1]
 
@@ -145,7 +145,7 @@ def test_binpack2mat():
     # convert to matrix formulation
     obj_val_pulp = bpp.problem.objective.value()
     all_vars = [bpp.x, bpp.y]
-    vars_dict, varnames = get_vars(all_vars)
+    vars_dict, varnames = get_vars(bpp.problem)
     const_mat, const_lb, const_ub = get_constraint_matrix(bpp.problem, vars_dict)
     obj_arr = get_objective_array(bpp.problem, vars_dict)
     integrality, lbounds, ubounds = get_bounds(vars_dict)
@@ -153,7 +153,7 @@ def test_binpack2mat():
     bounds = Bounds(lbounds, ubounds)
     consts = LinearConstraint(const_mat, const_lb, const_ub)
     result = milp(c=obj_arr, constraints=consts, integrality=integrality, bounds=bounds)
-    decode_solution(result, bpp.problem, all_vars)
+    decode_solution(result, bpp.problem)
     assert result.status == 0
     assert result.fun == obj_val_pulp
 
@@ -167,7 +167,7 @@ def test_maximize():
     # convert to matrix formulation
     obj_val_pulp = bpp.problem.objective.value()
     all_vars = [bpp.x, bpp.y]
-    vars_dict, varnames = get_vars(all_vars)
+    vars_dict, varnames = get_vars(bpp.problem)
     const_mat, const_lb, const_ub = get_constraint_matrix(bpp.problem, vars_dict)
     obj_arr = get_objective_array(bpp.problem, vars_dict)
     integrality, lbounds, ubounds = get_bounds(vars_dict)
@@ -175,6 +175,6 @@ def test_maximize():
     bounds = Bounds(lbounds, ubounds)
     consts = LinearConstraint(const_mat, const_lb, const_ub)
     result = milp(c=obj_arr, constraints=consts, integrality=integrality, bounds=bounds)
-    decode_solution(result, bpp.problem, all_vars)
+    decode_solution(result, bpp.problem)
     assert result.status == 0
     assert result.fun == -obj_val_pulp
