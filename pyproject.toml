@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pulp2mat"
-version = "0.1.2"
+version = "0.1.3"
 description = "convert pulp model into matrix formulation for scipy.optimize.milp"
 authors = ["rtonoue <rtonoue625@gmail.com>"]
 license = "MIT"
