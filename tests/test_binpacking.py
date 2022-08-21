@@ -144,7 +144,6 @@ def test_binpack2mat():
     bpp.solve()
     # convert to matrix formulation
     obj_val_pulp = bpp.problem.objective.value()
-    all_vars = [bpp.x, bpp.y]
     vars_dict, varnames = get_vars(bpp.problem)
     const_mat, const_lb, const_ub = get_constraint_matrix(bpp.problem, vars_dict)
     obj_arr = get_objective_array(bpp.problem, vars_dict)
@@ -166,7 +165,6 @@ def test_maximize():
     bpp.solve()
     # convert to matrix formulation
     obj_val_pulp = bpp.problem.objective.value()
-    all_vars = [bpp.x, bpp.y]
     vars_dict, varnames = get_vars(bpp.problem)
     const_mat, const_lb, const_ub = get_constraint_matrix(bpp.problem, vars_dict)
     obj_arr = get_objective_array(bpp.problem, vars_dict)

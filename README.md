@@ -15,8 +15,6 @@ Without poetry, please look at pyproject.toml and install all dependencies manua
 
 # Quick Example
 
-All variables must be defined in dictionaries. The key is tuple of variable indices, the value is pulp.LpVariable.
-
 For example, the binpacking problem can be formulated with pulp as below;
 
 ```python
@@ -62,6 +60,6 @@ the ```pulp.LpProblem``` object and the list of variable dictionaries can be con
 ```python
 import pulp2mat
 from scipy.optimize import milp
-c, integrality, constraints, bounds = pulp2mat.convert_all(problem, [x, y])
+c, integrality, constraints, bounds = pulp2mat.convert_all(problem)
 result = milp(c, integrality=integrality, constraints=constraints, bounds=bounds)
 ```
