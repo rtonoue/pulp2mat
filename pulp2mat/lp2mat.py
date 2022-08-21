@@ -1,8 +1,8 @@
-from typing import Iterable, Tuple, Any
+from typing import Iterable, Tuple
 
 import pulp as pl
 import numpy as np
-from scipy.optimize import milp, LinearConstraint, Bounds, OptimizeResult
+from scipy.optimize import LinearConstraint, Bounds, OptimizeResult
 
 
 def get_vars(
@@ -17,9 +17,7 @@ def get_vars(
         elif var.cat == "Integer":
             cat = 1
         else:
-            raise ValueError(
-                "LpVariable category needs to be Continuous or Integer."
-            )
+            raise ValueError("LpVariable category needs to be Continuous or Integer.")
         lb = var.lowBound
         ub = var.upBound
         if lb is None or np.isnan(lb):
@@ -66,7 +64,7 @@ def get_constraint_matrix(
 
 
 def get_objective_array(
-    problem: pl.LpProblem, vars_dict: dict[Any, Tuple[int, int, np.float64, np.float64]]
+    problem: pl.LpProblem, vars_dict: dict[str, Tuple[int, int, np.float64, np.float64]]
 ) -> np.ndarray:
     n_col = len(vars_dict)
     obj_arr = np.zeros(n_col, dtype=np.float64)
@@ -82,7 +80,7 @@ def get_objective_array(
 
 
 def get_bounds(
-    vars_dict: dict[Any, Tuple[int, int, np.float64, np.float64]]
+    vars_dict: dict[str, Tuple[int, int, np.float64, np.float64]]
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """get 1-d arrays of l and u such that
     l <= x <= u
