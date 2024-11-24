@@ -30,3 +30,7 @@ dev-dependencies = [
     "isort>=5.13.2",
     "pytest>=8.3.3",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
