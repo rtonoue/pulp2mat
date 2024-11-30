@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.5] - 2024-11-30
+### Changed
+- Support Python >=3.9
+
 ## [0.1.4] - 2024-11-24
 ### Changed
 - The virtual environment for this repository is managed by [uv](https://docs.astral.sh/uv/) from now.
